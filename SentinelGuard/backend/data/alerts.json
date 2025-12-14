@@ -1,0 +1,38 @@
+[
+  {
+    "type": "LOGIN_FAILURE",
+    "severity": "HIGH",
+    "message": "Multiple failed login attempts",
+    "time": "2025-12-12T21:34:43.582Z"
+  },
+  {
+    "type": "PORT_SCAN",
+    "severity": "MEDIUM",
+    "message": "Multiple ports scanned from same IP",
+    "time": "2025-12-13T19:31:18.358Z"
+  },
+  {
+    "type": "PORT_SCAN",
+    "severity": "MEDIUM",
+    "message": "Multiple ports scanned from same IP caught",
+    "time": "2025-12-13T19:42:48.412Z"
+  },
+  {
+    "type": "TEST",
+    "severity": "LOW",
+    "message": "Should pass",
+    "time": "2025-12-14T10:53:00.823Z"
+  },
+  {
+    "type": "TEST",
+    "severity": "LOW",
+    "message": "normal",
+    "time": "2025-12-14T12:49:00.220Z"
+  },
+  {
+    "type": "SPAM",
+    "severity": "LOW",
+    "message": "spam",
+    "time": "2025-12-14T12:49:24.856Z"
+  }
+]

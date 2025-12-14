@@ -1,0 +1,175 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>SentinelGuard — Health</title>
+  <style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #0f172a;
+    color: #e5e7eb;
+  }
+
+  .app {
+    max-width: 1000px;
+    margin: auto;
+    padding: 30px;
+  }
+
+  h1 {
+    margin-bottom: 5px;
+    color: #38bdf8;
+  }
+
+  h2 {
+    margin-top: 30px;
+    border-bottom: 1px solid #1e293b;
+    padding-bottom: 5px;
+  }
+
+  .card {
+    background: #020617;
+    border: 1px solid #1e293b;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+
+  .summary {
+    display: flex;
+    gap: 20px;
+  }
+
+  .summary .card {
+    flex: 1;
+    text-align: center;
+  }
+
+  .summary span {
+    font-size: 24px;
+    font-weight: bold;
+  }
+
+  button {
+    background: #020617;
+    border: 1px solid #1e293b;
+    color: #e5e7eb;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: #1e293b;
+  }
+
+  .alert {
+    border-left: 6px solid gray;
+    background: #020617;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+  }
+
+  .HIGH { border-color: #ef4444; }
+  .MEDIUM { border-color: #f59e0b; }
+  .LOW { border-color: #22c55e; }
+
+  small {
+    color: #94a3b8;
+  }
+</style>
+
+</head>
+<body>
+  <div class="app"></div>
+  <h1>SentinelGuard</h1>
+
+  <p>Backend status (fetched from <code>/api/health</code>):</p>
+  <pre id="health">loading…</pre>
+  <button id="refresh">Refresh</button>
+
+  <h2>Summary</h2>
+<div class="summary">
+  <div class="card">
+    <div>Total Alerts</div>
+    <span id="totalCount">0</span>
+  </div>
+  <div class="card">
+    <div>High Severity</div>
+    <span id="highCount">0</span>
+  </div>
+</div>
+
+
+  <h2>Filters</h2>
+<div style="margin-bottom:15px">
+  <button onclick="setFilter('ALL')">All</button>
+  <button onclick="setFilter('HIGH')">High</button>
+  <button onclick="setFilter('MEDIUM')">Medium</button>
+  <button onclick="setFilter('LOW')">Low</button>
+</div>
+
+
+  <h2>Alerts</h2>
+  <div id="alerts">Loading alerts…</div>
+
+  <script>
+  let allAlerts = [];
+  let currentFilter = 'ALL';
+
+  async function fetchHealth() {
+    const res = await fetch('/api/health');
+    const j = await res.json();
+    document.getElementById('health').innerText =
+      JSON.stringify(j, null, 2);
+  }
+
+  async function fetchAlerts() {
+    const res = await fetch('/api/alerts');
+    allAlerts = await res.json();
+    renderAlerts();
+  }
+
+  function setFilter(sev) {
+    currentFilter = sev;
+    renderAlerts();
+  }
+
+  function renderAlerts() {
+    const filtered =
+      currentFilter === 'ALL'
+        ? allAlerts
+        : allAlerts.filter(a => a.severity === currentFilter);
+
+    document.getElementById('totalCount').innerText = filtered.length;
+    document.getElementById('highCount').innerText =
+      filtered.filter(a => a.severity === 'HIGH').length;
+
+    if (filtered.length === 0) {
+      document.getElementById('alerts').innerText = 'No alerts';
+      return;
+    }
+
+    document.getElementById('alerts').innerHTML = filtered
+  .map(a => {
+    return `
+      <div class="alert ${a.severity}">
+        <b>${a.type}</b> (${a.severity})<br/>
+        ${a.message}<br/>
+        <small>${a.time}</small>
+      </div>
+    `;
+  })
+  .join('');
+
+  }
+
+  fetchHealth();
+  fetchAlerts();
+  setInterval(fetchAlerts, 10000);
+</script>
+</div>
+</body>
+</html>
